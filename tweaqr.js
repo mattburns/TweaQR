@@ -1,16 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-touch-fullscreen" content="yes" />
-<style type="text/css">
-  html { width:100%; height: 100% }
-  body { width:100%; height: 100%; margin: 0px; padding: 0px }
-  div#qrdiv {width:200px; height:200px}
-</style>
-
-<script type="text/javascript">
 
 // alignment pattern
 adelta = [
@@ -122,10 +109,11 @@ gexp = [
 
 // Working buffers:
 // data input and ecc append, image working buffer, fixed part of image, run lengths for badness
-var strinbuf=[], eccbuf=[], qrframe=[], framask=[], rlens=[]; 
+var strinbuf=[], eccbuf=[], qrframe=[], framask=[], rlens=[], toggles = []; 
 // Control values - width is based on version, last 4 are from table.
 var version, width, neccblk1, neccblk2, datablkw, eccblkwid;
-var ecclevel = 1;
+var ecclevel = 4;
+var qrMargin = 1;
 // set bit to indicate cell in qrframe is immutable.  symmetric around diagonal
 function setmask(x, y)
 {
@@ -711,36 +699,34 @@ function genframe(instring)
                 qrframe[7 + width * 8] = 1;
         }
 
-// return image
     return qrframe;
 }
 
 var wd, ht, qrc;
 function setupqr(){
-//    window.scrollTo(0,1)
-    wd = window.innerWidth-10;
-    ht = window.innerHeight-10;
+    wd = $("#form-row").width();
+    ht = $("#form-row").width();
     mp = document.getElementById("mapcanv");
 
     qrd = document.getElementById("qrdiv");
-    qrd.style.width = wd + "px";
-    qrd.style.height = ht + "px";
 
-    wd -= 4;
-    ht -= 80;
-
-    var elem = document.getElementById('qrcanv');
+    var elem = document.getElementById('qr-canvas');
     qrc = elem.getContext('2d');
     qrc.canvas.width = wd;
     qrc.canvas.height = ht;
     qrc.fillStyle = '#eee';
     qrc.fillRect(0,0,wd,ht);
 
+    elem.addEventListener("click", handleCanvasClick, false);
+
 }
 
 function doqr() {
     d = document;
-    ecclevel = d.qrinp.ECC.value;
+    
+    // always use 4
+    // ecclevel = d.qrinp.ECC.value;
+
     qf = genframe(d.qrinp.qrinput.value);
     qrc.lineWidth=1;
 
@@ -748,29 +734,121 @@ function doqr() {
     px = wd;
     if( ht < wd )
         px = ht;
-    px /= width+10;
+    px /= width+((qrMargin*2));
     px=Math.round(px - 0.5);
     qrc.clearRect(0,0,wd,ht);
-    qrc.fillStyle = '#fff';
-    qrc.fillRect(0,0,px*(width+8),px*(width+8));
-    qrc.fillStyle = '#000';
-    for( i = 0; i < width; i++ )
-        for( j = 0; j < width; j++ )
-            if( qf[j*width+i] )
-                qrc.fillRect(px*(4+i),px*(4+j),px,px)
+    qrc.fillStyle = d.qrinp.bgcol.value;
+    qrc.fillRect(0,0,px*(width+(qrMargin*2)),px*(width+(qrMargin*2)));
+    //qrc.fillStyle = d.qrinp.fgcol.value;
+    var showToggled = $("#show-toggled").is(':checked');
+    var showSpecial = $("#show-special").is(':checked');
+    
+    for( i = 0; i < width; i++ ) {
+        for( j = 0; j < width; j++ ) {     
+            if (showSpecial && ismasked(i, j)) {
+                qrc.fillStyle = "#cc6666";                        
+                qrc.fillRect(px*(qrMargin+i),px*(qrMargin+j),px,px);
+            } else {
+                if( !qf[j*width+i] != !toggles[j*width+i]) {
+                    if (toggles[j*width+i] && showToggled) {
+                        qrc.fillStyle = d.qrinp.togoncol.value;    
+                    } else {
+                        qrc.fillStyle = d.qrinp.fgcol.value;     
+                    }
+                    qrc.fillRect(px*(qrMargin+i),px*(qrMargin+j),px,px);
+                } else {
+                    if (qf[j*width+i] && showToggled) {
+                        qrc.fillStyle = d.qrinp.togoffcol.value;                        
+                        qrc.fillRect(px*(qrMargin+i),px*(qrMargin+j),px,px);
+                    }
+                }
+            }
+        }
+    }
 }
-</script>
-</head>
-<body onload="setupqr()">
-<div id="qrdiv" style="background:lightgray; position:absolute; width:360px; height:360px">
-    Javascript QR Encoder, Copyright 2010, tz@execpc.com, released under GPLv3
-  <form name="qrinp">
-    <input type="button" value="Go" onclick="doqr()"/>
-    ECC Level (1-4)
-    <input type="numeric" name="ECC" value="1" size="1"><br>
-    Text:<textarea name="qrinput" size=2953>Hello World!</textarea><br>
-  </form>
-    <canvas id="qrcanv"}>No Canvas Support?
-</div>
-</body>
-</html>
+
+function newqr() {
+    toggles = [];
+    doqr();
+}
+
+function validLocation(x, y) {
+	if ((x < 0) || (x >= width) ||
+            (y < 0) || (y >= width)) {
+		return false;
+	}
+	
+	if (ismasked(x, y)) {
+        showError("Sorry, this pixel is special");
+	    return false;
+    }
+    
+    return true;
+}
+
+
+function handleCanvasClick(e) {
+
+    var mouseX = e.pageX - this.offsetLeft;
+    var mouseY = e.pageY - this.offsetTop;
+
+	console.log("x=" + mouseX + ", y=" + mouseY);
+	
+    var px = wd;
+    if( ht < wd )
+        px = ht;
+    px /= width+(qrMargin*2);
+    px=Math.round(px - 0.5);
+    
+    var x2 = ((mouseX - (mouseX%px)) / px) - qrMargin;
+    var y2 = ((mouseY - (mouseY%px)) / px) - qrMargin;
+        
+    if (validLocation(x2, y2)) {
+	    if (toggles[x2 + y2 * width] == 1) {
+	        toggles[x2 + y2 * width] = 0;
+	    } else {
+	        toggles[x2 + y2 * width] = 1;
+	    } 
+    }
+    
+    doqr();
+    
+    var decoded = qrcode.decode();
+        
+    if (decoded != d.qrinp.qrinput.value) {
+        showError("Sorry, that would corrupt the message");
+ 	    if (toggles[x2 + y2 * width] == 1) {
+	        toggles[x2 + y2 * width] = 0;
+	    } else {
+	        toggles[x2 + y2 * width] = 1;
+	    } 
+    }
+    doqr();
+}
+
+function generateImage() {
+    var canvas = document.getElementById("qr-canvas");
+    window.open(canvas.toDataURL('image/png'));
+}
+
+function showError(msg) {
+    $("#popupBasic").popup("open");
+    $("#error-text").text(msg);
+}
+
+function init() {
+    $("#qrinput").change(newqr);
+    $("#qrinput").keyup(newqr);
+    $("#bgcol, #fgcol, #togoncol, #togoffcol").keyup(doqr);
+    $("#show-toggled").bind( "change", function(event, ui) {
+        console.log(event.target.checked);
+        if (event.target.checked) {
+            $("#togoncol, #togoffcol").textinput("enable");
+        } else {
+            $("#togoncol, #togoffcol").textinput("disable");
+        }
+    });
+    $("#show-toggled, #show-special").change(doqr);
+    setupqr();
+    newqr();
+}

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-touch-fullscreen" content="yes">
+
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
+<link rel="stylesheet" href="tweaqr.css" />
+<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+<script src="tweaqr.js"></script>
+
+<!-- for the qr reader: -->
+<script type="text/javascript" src="grid.js"></script>
+<script type="text/javascript" src="version.js"></script>
+<script type="text/javascript" src="detector.js"></script>
+<script type="text/javascript" src="formatinf.js"></script>
+<script type="text/javascript" src="errorlevel.js"></script>
+<script type="text/javascript" src="bitmat.js"></script>
+<script type="text/javascript" src="datablock.js"></script>
+<script type="text/javascript" src="bmparser.js"></script>
+<script type="text/javascript" src="datamask.js"></script>
+<script type="text/javascript" src="rsdecoder.js"></script>
+<script type="text/javascript" src="gf256poly.js"></script>
+<script type="text/javascript" src="gf256.js"></script>
+<script type="text/javascript" src="decoder.js"></script>
+<script type="text/javascript" src="qrcode.js"></script>
+<script type="text/javascript" src="findpat.js"></script>
+<script type="text/javascript" src="alignpat.js"></script>
+<script type="text/javascript" src="databr.js"></script>
+
+</head>
+<body onload="init()">
+
+    <div data-role="header">
+        <h1>TweaQR</h1>
+    </div>
+    
+    <div id="qrdiv">
+        <!-- Javascript QR Encoder, Copyright 2010, tz@execpc.com, released under GPLv3 -->
+
+        <div data-role="content">
+            <form name="qrinp">
+
+                <div class="intro-text">
+                    <p>
+                        Tweak your QR code by clicking the pixels. You can "corrupt" up to 30% of the pixels before you break it.
+                    </p>
+                </div>
+
+                
+                <div data-role="fieldcontain" id="form-row">
+	                <label for="qrinput">Text:</label>
+	                <textarea cols="40" rows="8" name="qrinput" id="qrinput">Welcome to TweaQR, the QR Tweaker</textarea>
+                </div>
+
+                <canvas id="qr-canvas" >No Canvas Support?</canvas>
+
+                <div data-role="collapsible" data-collapsed="true"  data-content-theme="c" >
+                    <h3 title="Advanced control of the generated image">Extra options</h3>
+
+                    <div data-role="fieldcontain">
+                         <label for="fgcol">Foreground color:</label>
+                         <input type="color" name="fgcol" id="fgcol" value="#27496B" />
+                    </div>
+
+                    <div data-role="fieldcontain">
+                        <label for="bgcol">Background color:</label>
+                        <input type="color" name="bgcol" id="bgcol" value="#ffffff" />
+                    </div>
+    
+                    <div data-role="fieldcontain">
+                        <fieldset data-role="controlgroup">
+                            <legend>Show toggled colors:</legend>
+                            <input type="checkbox" name="show-toggled" id="show-toggled" />
+                            <label for="show-toggled">On</label>
+                        </fieldset>
+                    </div>
+                    
+                    <div data-role="fieldcontain">
+                         <label for="togoncol">Toggled on Color:</label>
+                         <input type="color" name="togoncol" id="togoncol" value="#37597B" disabled="true" />
+                    </div>
+
+                    <div data-role="fieldcontain">
+                        <label for="togoffcol">Toggled off Color:</label>
+                        <input type="color" name="togoffcol" id="togoffcol" value="#dfdfdf" disabled="true"/>
+                    </div>
+                    
+                    <div data-role="fieldcontain">
+                        <fieldset data-role="controlgroup">
+                            <legend>Show special pixels:</legend>
+                            <input type="checkbox" name="show-special" id="show-special" />
+                            <label for="show-special">On</label>
+                        </fieldset>
+                    </div>
+                
+                </div>
+            </form>
+
+                
+            <div data-role="popup" id="popupBasic" class="ui-content" data-overlay-theme="a">
+	            <p id="error-text">This is a completely basic popup, no options set.<p>
+            </div>
+                
+            <div class="text-align-right">
+	            <p id="toggle-text">This is a completely basic popup, no options set.<p>
+                
+                <a href="#" class="image-link" onclick="generateImage()" data-role="button" data-inline="true" data-theme="b">Save as png</a>
+            </div>
+
+            <p>&copy;2013 <a href="http://www.mattburns.co.uk">Matt Burns</a>, creator of <a href="http://www.oddprints.com">OddPrints</a> and <a href="http://www.stolencamerafinder.com">StolenCameraFinder</a>.</p>
+            <p>Based on <a href="http://code.google.com/p/jsqrencode/">Javascript QR Encoder</a> by tz@execpc.com, released under GPLv3 and <a href="https://github.com/LazarSoft/jsqrcode">jsqrcode</a> by <a href="https://github.com/LazarSoft">LazarSoft</a>, released under Apache v2.0</p>
+
+        </div>
+
+    </div>
+
+</body></html>
