@@ -721,7 +721,7 @@ function setupqr(){
 
 }
 
-function doqr() {
+function doqr(showSpecial) {
     d = document;
     
     // always use 4
@@ -739,9 +739,7 @@ function doqr() {
     qrc.clearRect(0,0,wd,ht);
     qrc.fillStyle = d.qrinp.bgcol.value;
     qrc.fillRect(0,0,px*(width+(qrMargin*2)),px*(width+(qrMargin*2)));
-    //qrc.fillStyle = d.qrinp.fgcol.value;
     var showToggled = $("#show-toggled").is(':checked');
-    var showSpecial = $("#show-special").is(':checked');
     
     for( i = 0; i < width; i++ ) {
         for( j = 0; j < width; j++ ) {     
@@ -779,8 +777,8 @@ function validLocation(x, y) {
 	}
 	
 	if (ismasked(x, y)) {
-        showError("Sorry, this pixel is special");
-	    return false;
+        showError("Sorry, this pixel is special (<a href='#' onclick='doqr(true)'>show all</a>)");
+        return false;
     }
     
     return true;
@@ -835,14 +833,17 @@ function generateImage() {
 }
 
 function showError(msg) {
-    $("#popupBasic").popup("open");
-    $("#error-text").text(msg);
+    $("#popupBasic").popup("open", {"positionTo": "origin"});
+    $("#popupBasic").click(function() {
+        $("#popupBasic").popup("close");
+    });
+    $("#error-text").html(msg);
 }
 
 function init() {
     $("#qrinput").change(newqr);
     $("#qrinput").keyup(newqr);
-    $("#bgcol, #fgcol, #togoncol, #togoffcol").keyup(doqr);
+    $("#bgcol, #fgcol, #togoncol, #togoffcol").keyup(function(){doqr(false);});
     $("#show-toggled").bind( "change", function(event, ui) {
         if (event.target.checked) {
             $("#togoncol, #togoffcol").textinput("enable");
@@ -850,7 +851,7 @@ function init() {
             $("#togoncol, #togoffcol").textinput("disable");
         }
     });
-    $("#show-toggled, #show-special").change(doqr);
+    $("#show-toggled, #show-special").change(function(){doqr(false);});
     setupqr();
     newqr();
 }
