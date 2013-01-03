@@ -792,8 +792,6 @@ function handleCanvasClick(e) {
     var mouseX = e.pageX - this.offsetLeft;
     var mouseY = e.pageY - this.offsetTop;
 
-	console.log("x=" + mouseX + ", y=" + mouseY);
-	
     var px = wd;
     if( ht < wd )
         px = ht;
@@ -813,7 +811,12 @@ function handleCanvasClick(e) {
     
     doqr();
     
-    var decoded = qrcode.decode();
+    var decoded = null;
+    try {
+        decoded = qrcode.decode();
+    } catch (e) {
+//        console.log("error decoding QR");
+    }
         
     if (decoded != d.qrinp.qrinput.value) {
         showError("Sorry, that would corrupt the message");
@@ -841,7 +844,6 @@ function init() {
     $("#qrinput").keyup(newqr);
     $("#bgcol, #fgcol, #togoncol, #togoffcol").keyup(doqr);
     $("#show-toggled").bind( "change", function(event, ui) {
-        console.log(event.target.checked);
         if (event.target.checked) {
             $("#togoncol, #togoffcol").textinput("enable");
         } else {
