@@ -51,3 +51,9 @@
     .intro-text p {
         font-size: 28px;
     }
+    
+    .qr-gallery a img {
+        box-shadow: 0px 0px 15px #222;
+        margin: 15px 15px 0px 0px;
+    }
+
