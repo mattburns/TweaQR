@@ -1,7 +1,7 @@
 TweaQR
 ======
 
-Play with it [here](http://mattburns.github.com/TweaQR/).
+Play with it [here](https://mattburns.co.uk/TweaQR/).
 
 QR code generator that lets you tweak the pixels without corrupting the image.
 From the creator of [www.OddPrints.com](http://www.OddPrints.com "OddPrints Website")
@@ -19,4 +19,4 @@ This project takes that to the next level by allowing you to easily toggle speci
 * Visually bigger logos can be drawn
 * They look awesome
 
-What are you waiting for, [Go Play](http://mattburns.github.com/TweaQR/)!
+What are you waiting for, [Go Play](https://mattburns.co.uk/TweaQR/)!
